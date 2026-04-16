@@ -1,6 +1,0 @@
-@VestibularPeerToPeer_HostAddress = http://localhost:5157
-
-GET {{VestibularPeerToPeer_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
