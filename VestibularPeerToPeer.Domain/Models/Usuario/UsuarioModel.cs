@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace VestibularPeerToPeer.Domain.Models.Usuario
 {
-    internal class UsuarioModel
+    public class CadastroModelRequest
     {
+        public string? Id { get; set; }
+        public string? Login { get; set; }
+        public string? Senha { get; set; }
+        public string? Nome { get; set; }
+        public string? Email { get; set; }
     }
 }

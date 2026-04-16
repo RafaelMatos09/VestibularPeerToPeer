@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VestibularPeerToPeer.Domain.Models.Usuario;
 
 namespace VestibularPeerToPeer.Domain.Interfaces.Services
 {
-    internal interface IUsuarioService
+    public interface IUsuarioService
     {
+        Task<CadastroModelRequest> CadastrarAsync(CadastroModelRequest usuario);
     }
 }
