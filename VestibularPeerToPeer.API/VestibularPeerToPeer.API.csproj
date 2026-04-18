@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VestibularPeerToPeer.Application\VestibularPeerToPeer.Application.csproj" />
+    <ProjectReference Include="..\VestibularPeerToPeer.Domain\VestibularPeerToPeer.Domain.csproj" />
     <ProjectReference Include="..\VestibularPeerToPeer.Infrastructure\VestibularPeerToPeer.Infrastructure.csproj" />
   </ItemGroup>
 

@@ -1,21 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VestibularPeerToPeer.Infrastructure.Repositories;
+﻿using VestibularPeerToPeer.Domain.Interfaces.Repositories;
+using VestibularPeerToPeer.Domain.Interfaces.Services;
+using VestibularPeerToPeer.Domain.Models.Usuario;
 
 namespace VestibularPeerToPeer.Infrastructure.Services
 {
-    public class UsuarioService
+    public class UsuarioService : IUsuarioService
     {
-        private readonly  UsuarioRepository _usuarioRepository;
+        private readonly IUsuarioRepository _usuarioRepository;
 
-        public UsuarioService(UsuarioRepository repository)
+        public UsuarioService(IUsuarioRepository usuarioRepository)
         {
-            _usuarioRepository = repository;
+            _usuarioRepository = usuarioRepository;
         }
 
-      
+        public async Task<CadastroModelRequest> CadastrarAsync(CadastroModelRequest usuario)
+        {
+            return await _usuarioRepository.CadastrarAsync(usuario);
+        }
     }
 }

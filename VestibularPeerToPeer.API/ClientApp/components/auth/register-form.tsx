@@ -24,8 +24,8 @@ export function RegisterForm() {
 
     try {
       await register(name, email, password);
-    } catch {
-      setError('Erro ao criar conta. Tente novamente.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao criar conta. Tente novamente.');
     }
   };
 
