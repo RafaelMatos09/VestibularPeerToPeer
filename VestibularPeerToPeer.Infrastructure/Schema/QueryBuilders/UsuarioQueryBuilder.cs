@@ -43,11 +43,11 @@ namespace VestibularPeerToPeer.Infrastructure.Schema.QueryBuilders
         /// <summary>
         /// Builds a SELECT query to retrieve a user by ID.
         /// </summary>
-        public static Query BuildSelectByIdQuery(int id)
+        public static Query BuildSelectByIdQuery(string id)
         {
             return new Query(Tables.UsuarioTable.TableName)
                 .Where(Tables.UsuarioTable.Columns.Id, "=", id)
-                .Where(Tables.UsuarioTable.Columns.Ativo, false);
+                .Where(Tables.UsuarioTable.Columns.Ativo, true);
         }
 
         /// <summary>

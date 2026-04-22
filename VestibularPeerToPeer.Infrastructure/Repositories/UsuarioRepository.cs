@@ -5,6 +5,7 @@ using VestibularPeerToPeer.Infrastructure.Schema.QueryBuilders;
 using VestibularPeerToPeer.Domain.Interfaces.Repositories;
 using SqlKata.Compilers;
 using BCrypt.Net;
+using VestibularPeerToPeer.Domain.Models.Login;
 
 namespace VestibularPeerToPeer.Infrastructure.Repositories
 {
@@ -53,6 +54,27 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
             catch (Exception ex)
             {
                 throw new Exception($"Erro ao cadastrar usuário: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<CadastroModelRequest> BuscarPorLogin(LoginRequestModel req)
+        {
+            if (string.IsNullOrWhiteSpace(req.Login))
+                throw new ArgumentException("Login não pode ser vazio.", nameof(req.Login));
+            try
+            {
+                // Build SELECT query using strongly-typed builder
+                var selectQuery = UsuarioQueryBuilder.BuildSelectByIdQuery(req.Id);
+                // Compile to SQL with parameters
+                var compiler = new PostgresCompiler();
+                var compiled = compiler.Compile(selectQuery);
+                // Query via Dapper with positional parameters from SqlKata
+                var usuario = await _context.QueryFirstOrDefaultAsync<CadastroModelRequest>(compiled.Sql, compiled.Bindings);
+                return usuario;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao buscar usuário por login: {ex.Message}", ex);
             }
         }
     }

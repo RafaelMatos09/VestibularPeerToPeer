@@ -1,5 +1,6 @@
 ﻿using VestibularPeerToPeer.Domain.Interfaces.Repositories;
 using VestibularPeerToPeer.Domain.Interfaces.Services;
+using VestibularPeerToPeer.Domain.Models.Login;
 using VestibularPeerToPeer.Domain.Models.Usuario;
 
 namespace VestibularPeerToPeer.Infrastructure.Services
@@ -16,6 +17,11 @@ namespace VestibularPeerToPeer.Infrastructure.Services
         public async Task<CadastroModelRequest> CadastrarAsync(CadastroModelRequest usuario)
         {
             return await _usuarioRepository.CadastrarAsync(usuario);
+        }
+
+        public async Task<CadastroModelRequest> BuscarPorLogin(LoginRequestModel)
+        {
+            return await _usuarioRepository.BuscarPorLogin(LoginRequestModel);
         }
     }
 }
