@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using VestibularPeerToPeer.API.Services;
 using VestibularPeerToPeer.Domain.Interfaces.Services;
 using VestibularPeerToPeer.Domain.Models.Login;
 using VestibularPeerToPeer.Infrastructure.Repositories;
@@ -33,7 +34,10 @@ namespace VestibularPeerToPeer.API.Controllers
 
             var tokenService = new TokenService("SUA_CHAVE_SECRETA_AQUI_123");
 
-            var token = tokenService.GerarToken(req.Id.ToString(), req.Email);
+            var token = tokenService.GerarToken(
+                user.Id ?? string.Empty,
+                user.Email ?? req.Email ?? string.Empty
+            );
 
             return Ok(new
             {

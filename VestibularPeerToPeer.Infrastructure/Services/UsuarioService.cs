@@ -19,9 +19,9 @@ namespace VestibularPeerToPeer.Infrastructure.Services
             return await _usuarioRepository.CadastrarAsync(usuario);
         }
 
-        public async Task<CadastroModelRequest> BuscarPorLogin(LoginRequestModel)
+        public async Task<CadastroModelRequest> BuscarPorLogin(LoginRequestModel loginRequest)
         {
-            return await _usuarioRepository.BuscarPorLogin(LoginRequestModel);
+            return await _usuarioRepository.BuscarPorLogin(loginRequest);
         }
     }
 }

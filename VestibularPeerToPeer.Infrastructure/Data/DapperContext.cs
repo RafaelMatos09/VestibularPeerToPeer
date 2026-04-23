@@ -4,21 +4,26 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using System.Data.Common;
 using Npgsql;
 
 namespace VestibularPeerToPeer.Infrastructure.Data
 {
     public interface IDapperContext
     {
-        IDbConnection CreateConnection();
+        DbConnection GetDbConnection();
 
-        Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null);
+        T? Get<T>(string sql, object? param = null, CommandType commandType = CommandType.Text);
 
-        Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? param = null);
+        IEnumerable<T> GetAll<T>(string sql, object? param = null, CommandType commandType = CommandType.Text);
 
-        Task<int> ExecuteAsync(string sql, object? param = null);
+        Task<IEnumerable<T>> GetAllAsync<T>(string sql, object? param = null, CommandType commandType = CommandType.Text);
 
-        Task<int> ExecuteAsync(string sql, IEnumerable<object?>? bindings = null);
+        Task<T?> GetAsync<T>(string sql, object? param = null, CommandType commandType = CommandType.Text);
+
+        int Execute(string sql, object? param = null, CommandType commandType = CommandType.Text);
+
+        Task<int> ExecuteAsync(string sql, object? param = null, CommandType commandType = CommandType.Text);
     }
 
     public class DapperContext : IDapperContext
@@ -30,52 +35,45 @@ namespace VestibularPeerToPeer.Infrastructure.Data
             _connectionString = connectionString;
         }
 
-        public IDbConnection CreateConnection()
+        public DbConnection GetDbConnection()
         {
             return new NpgsqlConnection(_connectionString);
         }
 
-        public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null)
+        public T? Get<T>(string sql, object? param = null, CommandType commandType = CommandType.Text)
         {
-            using var connection = CreateConnection();
-            return await connection.QueryAsync<T>(sql, param);
+            using var connection = GetDbConnection();
+            return connection.QueryFirstOrDefault<T>(sql, param, commandType: commandType);
         }
 
-        public async Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? param = null)
+        public IEnumerable<T> GetAll<T>(string sql, object? param = null, CommandType commandType = CommandType.Text)
         {
-            using var connection = CreateConnection();
-            return await connection.QueryFirstOrDefaultAsync<T>(sql, param);
+            using var connection = GetDbConnection();
+            return connection.Query<T>(sql, param, commandType: commandType);
         }
 
-        public async Task<int> ExecuteAsync(string sql, object? param = null)
+        public async Task<IEnumerable<T>> GetAllAsync<T>(string sql, object? param = null, CommandType commandType = CommandType.Text)
         {
-            using var connection = CreateConnection();
-            return await connection.ExecuteAsync(sql, param);
+            using var connection = GetDbConnection();
+            return await connection.QueryAsync<T>(sql, param, commandType: commandType);
         }
 
-        /// <summary>
-        /// Executes SQL with positional parameters from SqlKata compilation.
-        /// Converts array bindings to DynamicParameters for proper Dapper handling.
-        /// </summary>
-        public async Task<int> ExecuteAsync(string sql, IEnumerable<object?>? bindings = null)
+        public async Task<T?> GetAsync<T>(string sql, object? param = null, CommandType commandType = CommandType.Text)
         {
-            using var connection = CreateConnection();
+            using var connection = GetDbConnection();
+            return await connection.QueryFirstOrDefaultAsync<T>(sql, param, commandType: commandType);
+        }
 
-            if (bindings == null || !bindings.Any())
-            {
-                return await connection.ExecuteAsync(sql);
-            }
+        public int Execute(string sql, object? param = null, CommandType commandType = CommandType.Text)
+        {
+            using var connection = GetDbConnection();
+            return connection.Execute(sql, param, commandType: commandType);
+        }
 
-            // Convert bindings array to DynamicParameters for proper PostgreSQL positional parameter handling
-            var parameters = new DynamicParameters();
-            var bindingsList = bindings.ToList();
-
-            for (int i = 0; i < bindingsList.Count; i++)
-            {
-                parameters.Add($"@p{i}", bindingsList[i]);
-            }
-
-            return await connection.ExecuteAsync(sql, parameters);
+        public async Task<int> ExecuteAsync(string sql, object? param = null, CommandType commandType = CommandType.Text)
+        {
+            using var connection = GetDbConnection();
+            return await connection.ExecuteAsync(sql, param, commandType: commandType);
         }
     }
 }

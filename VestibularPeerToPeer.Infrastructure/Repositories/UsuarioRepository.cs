@@ -1,18 +1,11 @@
-using SqlKata.Execution;
 using VestibularPeerToPeer.Domain.Models.Usuario;
 using VestibularPeerToPeer.Infrastructure.Data;
-using VestibularPeerToPeer.Infrastructure.Schema.QueryBuilders;
 using VestibularPeerToPeer.Domain.Interfaces.Repositories;
-using SqlKata.Compilers;
-using BCrypt.Net;
 using VestibularPeerToPeer.Domain.Models.Login;
+using Dapper;
 
 namespace VestibularPeerToPeer.Infrastructure.Repositories
 {
-    /// <summary>
-    /// Refactored repository using strongly-typed query builder instead of raw SQL strings.
-    /// Eliminates parameter name mismatches and provides compile-time safety.
-    /// </summary>
     public class UsuarioRepository : IUsuarioRepository
     {
         private readonly IDapperContext _context;
@@ -22,27 +15,55 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
             _context = context;
         }
 
-        /// <summary>
-        /// Cadastra um novo usuário usando query builder type-safe.
-        /// </summary>
         public async Task<CadastroModelRequest> CadastrarAsync(CadastroModelRequest usuario)
         {
-            if(usuario == null)
+            if (usuario == null)
                 throw new ArgumentNullException(nameof(usuario));
+
+            if (string.IsNullOrWhiteSpace(usuario.Email))
+                throw new ArgumentException("Email não pode ser vazio.", nameof(usuario.Email));
+
+            if (string.IsNullOrWhiteSpace(usuario.Nome))
+                throw new ArgumentException("Nome não pode ser vazio.", nameof(usuario.Nome));
+
+            if (string.IsNullOrWhiteSpace(usuario.Senha))
+                throw new ArgumentException("Senha não pode ser vazia.", nameof(usuario.Senha));
 
             usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuario.Senha, workFactor: 12);
 
+            var dbParams = new DynamicParameters();
+            dbParams.Add("@Nome", usuario.Nome);
+            dbParams.Add("@Email", usuario.Email);
+            dbParams.Add("@SenhaHash", usuario.Senha);
+            dbParams.Add("@TipoUsuarioId", 1);
+            dbParams.Add("@InstituicaoId", 2);
+            dbParams.Add("@Ativo", true);         
+                     
+
+            const string insertSql = @"
+                INSERT INTO public.usuarios
+                (
+                    nome,
+                    email,
+                    senha_hash,
+                    tipo_usuario_id,
+                    instituicao_id,                    
+                    ativo
+                )
+                VALUES
+                (
+                    @Nome,
+                    @Email,
+                    @SenhaHash,
+                    @TipoUsuarioId,
+                    @InstituicaoId,                    
+                    @Ativo
+                );";
+
             try
-            {
-                // Build INSERT query using strongly-typed builder
-                var insertQuery = UsuarioQueryBuilder.BuildInsertQuery(usuario);
+            {              
 
-                // Compile to SQL with parameters (SqlKata handles parameter binding)
-                var compiler = new PostgresCompiler();
-                var compiled = compiler.Compile(insertQuery);
-
-                // Execute via Dapper with positional parameters from SqlKata
-                var result = await _context.ExecuteAsync(compiled.Sql, compiled.Bindings);
+                var result = await _context.ExecuteAsync(insertSql, dbParams, System.Data.CommandType.Text);
 
                 if (result == 0)
                 {
@@ -59,17 +80,27 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
 
         public async Task<CadastroModelRequest> BuscarPorLogin(LoginRequestModel req)
         {
-            if (string.IsNullOrWhiteSpace(req.Login))
-                throw new ArgumentException("Login não pode ser vazio.", nameof(req.Login));
+            if (string.IsNullOrWhiteSpace(req.Email))
+                throw new ArgumentException("Email não pode ser vazio.", nameof(req.Email));
+
+            const string selectSql = @"
+                SELECT
+                    id AS Id,
+                    nome AS Nome,
+                    email AS Email,
+                    senha_hash AS Senha,
+                    email AS Login
+                FROM public.usuarios
+                WHERE email = @Email
+                  AND ativo = true
+                LIMIT 1;";
+
             try
             {
-                // Build SELECT query using strongly-typed builder
-                var selectQuery = UsuarioQueryBuilder.BuildSelectByIdQuery(req.Id);
-                // Compile to SQL with parameters
-                var compiler = new PostgresCompiler();
-                var compiled = compiler.Compile(selectQuery);
-                // Query via Dapper with positional parameters from SqlKata
-                var usuario = await _context.QueryFirstOrDefaultAsync<CadastroModelRequest>(compiled.Sql, compiled.Bindings);
+                var usuario = await _context.GetAsync<CadastroModelRequest>(
+                    selectSql,
+                    new { Email = req.Email.Trim() }
+                );
                 return usuario;
             }
             catch (Exception ex)
