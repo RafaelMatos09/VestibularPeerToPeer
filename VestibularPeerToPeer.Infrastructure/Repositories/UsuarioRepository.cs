@@ -14,8 +14,9 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
         {
             _context = context;
         }
+        
 
-        public async Task<CadastroModelRequest> CadastrarAsync(CadastroModelRequest usuario)
+        public async Task<UsuarioModel> CadastrarAsync(UsuarioModel usuario)
         {
             if (usuario == null)
                 throw new ArgumentNullException(nameof(usuario));
@@ -26,15 +27,15 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
             if (string.IsNullOrWhiteSpace(usuario.Nome))
                 throw new ArgumentException("Nome não pode ser vazio.", nameof(usuario.Nome));
 
-            if (string.IsNullOrWhiteSpace(usuario.Senha))
-                throw new ArgumentException("Senha não pode ser vazia.", nameof(usuario.Senha));
+            if (string.IsNullOrWhiteSpace(usuario.SenhaHash))
+                throw new ArgumentException("Senha não pode ser vazia.", nameof(usuario.SenhaHash));
 
-            usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuario.Senha, workFactor: 12);
+            usuario.SenhaHash = BCrypt.Net.BCrypt.HashPassword(usuario.SenhaHash, workFactor: 12);
 
             var dbParams = new DynamicParameters();
             dbParams.Add("@Nome", usuario.Nome);
             dbParams.Add("@Email", usuario.Email);
-            dbParams.Add("@SenhaHash", usuario.Senha);
+            dbParams.Add("@SenhaHash", usuario.SenhaHash);
             dbParams.Add("@TipoUsuarioId", 1);
             dbParams.Add("@InstituicaoId", 2);
             dbParams.Add("@Ativo", true);         
@@ -78,7 +79,7 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
             }
         }
 
-        public async Task<CadastroModelRequest> BuscarPorLogin(LoginRequestModel req)
+        public async Task<UsuarioModel> BuscarPorLogin(LoginRequestModel req)
         {
             if (string.IsNullOrWhiteSpace(req.Email))
                 throw new ArgumentException("Email não pode ser vazio.", nameof(req.Email));
@@ -97,7 +98,7 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
 
             try
             {
-                var usuario = await _context.GetAsync<CadastroModelRequest>(
+                var usuario = await _context.GetAsync<UsuarioModel>(
                     selectSql,
                     new { Email = req.Email.Trim() }
                 );

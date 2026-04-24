@@ -5,7 +5,7 @@ namespace VestibularPeerToPeer.Domain.Interfaces.Services
 {
     public interface IUsuarioService
     {
-        Task<CadastroModelRequest> CadastrarAsync(CadastroModelRequest usuario);
-        Task<CadastroModelRequest> BuscarPorLogin(LoginRequestModel req);
+        Task<UsuarioModel> CadastrarAsync(UsuarioModel usuario);
+        Task<UsuarioModel> BuscarPorLogin(LoginRequestModel req);
     }
 }

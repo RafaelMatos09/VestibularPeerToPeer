@@ -14,12 +14,12 @@ namespace VestibularPeerToPeer.Infrastructure.Services
             _usuarioRepository = usuarioRepository;
         }
 
-        public async Task<CadastroModelRequest> CadastrarAsync(CadastroModelRequest usuario)
+        public async Task<UsuarioModel> CadastrarAsync(UsuarioModel usuario)
         {
             return await _usuarioRepository.CadastrarAsync(usuario);
         }
 
-        public async Task<CadastroModelRequest> BuscarPorLogin(LoginRequestModel loginRequest)
+        public async Task<UsuarioModel> BuscarPorLogin(LoginRequestModel loginRequest)
         {
             return await _usuarioRepository.BuscarPorLogin(loginRequest);
         }

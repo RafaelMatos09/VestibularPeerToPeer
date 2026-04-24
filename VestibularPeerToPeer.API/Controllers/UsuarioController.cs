@@ -20,19 +20,19 @@ namespace VestibularPeerToPeer.API.Controllers
         [HttpPost("cadastrar")]
         [ProducesResponseType(typeof(CadastrarUsuarioResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Cadastrar([FromBody] CadastrarUsuarioRequest request)
+        public async Task<IActionResult> Cadastrar([FromBody] UsuarioModel request)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var model = new CadastroModelRequest
+            var model = new UsuarioModel
             {
                 Nome = request.Nome.Trim(),
                 Email = request.Email.Trim(),
-                Senha = request.Senha,
-                Login = request.Email.Trim()
+                SenhaHash = request.SenhaHash,
+                Email = request.Email
             };
 
             try

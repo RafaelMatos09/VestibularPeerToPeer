@@ -24,10 +24,10 @@ namespace VestibularPeerToPeer.API.Controllers
         {
             var user = await _usuarioService.BuscarPorLogin(req);
 
-            if (user == null || user.Senha != req.Senha)
+            if (user == null || user.SenhaHash != req.Senha)
                 return Unauthorized("Usuário ou senha inválidos");
 
-            var senhaValida = BCrypt.Net.BCrypt.Verify(req.Senha, user.Senha);
+            var senhaValida = BCrypt.Net.BCrypt.Verify(req.Senha, user.SenhaHash);
 
             if (!senhaValida)
                 return Unauthorized("Senha inválida");
