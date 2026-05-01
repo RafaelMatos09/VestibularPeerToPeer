@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using VestibularPeerToPeer.API.Models;
 using VestibularPeerToPeer.Domain.Interfaces.Services;
 using VestibularPeerToPeer.Domain.Models;
@@ -7,6 +8,7 @@ namespace VestibularPeerToPeer.API.Controllers
 {
     [ApiController]
     [Route("api/usuarios")]
+    [Authorize]
     public class UsuarioController : ControllerBase
     {
         private readonly IUsuarioService _usuarioService;
@@ -16,6 +18,7 @@ namespace VestibularPeerToPeer.API.Controllers
             _usuarioService = usuarioService;
         }
                 
+        [AllowAnonymous]
         [HttpPost("cadastrar")]        
         public async Task<IActionResult> Cadastrar([FromBody] UsuarioModel request)
         {

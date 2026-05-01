@@ -1,4 +1,5 @@
 import { getApiBaseUrl } from './base-url';
+import { getAuthToken } from '../auth-token';
 
 export type FetchJsonInit = Omit<RequestInit, 'body'> & {
   body?: unknown;
@@ -14,6 +15,10 @@ export async function fetchJson<T>(path: string, init: FetchJsonInit = {}): Prom
   const headers = new Headers(init.headers);
   if (init.body !== undefined && !(init.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
+  }
+  const token = getAuthToken();
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
   }
 
   const response = await fetch(url, {

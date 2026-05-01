@@ -1,9 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VestibularPeerToPeer.Domain.Interfaces.Services;
 
 namespace VestibularPeerToPeer.API.Controllers
 {
+    [ApiController]
+    [Route("disciplina")]
+    [Authorize]
     public class DisciplinaController : ControllerBase
     {
         readonly IDisciplinaService _disciplinaService;

@@ -1,8 +1,8 @@
-﻿using VestibularPeerToPeer.Domain.Interfaces.Repositories;
+using VestibularPeerToPeer.Domain.Interfaces.Repositories;
 using VestibularPeerToPeer.Domain.Interfaces.Services;
 using VestibularPeerToPeer.Domain.Models;
 
-namespace VestibularPeerToPeer.Infrastructure.Services
+namespace VestibularPeerToPeer.API.Services
 {
     public class UsuarioService : IUsuarioService
     {
@@ -18,10 +18,9 @@ namespace VestibularPeerToPeer.Infrastructure.Services
             return await _usuarioRepository.CadastrarAsync(usuario);
         }
 
-        public async Task<UsuarioModel> BuscarPorLogin(LoginRequestModel loginRequest)
+        public async Task<UsuarioModel?> BuscarPorLogin(LoginRequestModel loginRequest)
         {
             return await _usuarioRepository.BuscarPorLogin(loginRequest);
         }
-        
     }
 }

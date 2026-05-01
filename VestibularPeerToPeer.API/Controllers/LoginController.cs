@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using VestibularPeerToPeer.API.Services;
 using VestibularPeerToPeer.Domain.Interfaces.Services;
 using VestibularPeerToPeer.Domain.Models;
-using VestibularPeerToPeer.Infrastructure.Repositories;
 
 namespace VestibularPeerToPeer.API.Controllers
 {
@@ -13,18 +12,24 @@ namespace VestibularPeerToPeer.API.Controllers
     {
 
         private readonly IUsuarioService _usuarioService;
+        private readonly TokenService _tokenService;
 
-        public LoginController(IUsuarioService usuarioService)
+        public LoginController(IUsuarioService usuarioService, TokenService tokenService)
         {
             _usuarioService = usuarioService;
+            _tokenService = tokenService;
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginRequestModel req)
+        public async Task<IActionResult> Login([FromBody] LoginRequestModel req)
         {
+            if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Senha))
+                return BadRequest(new { message = "Email e senha são obrigatórios." });
+
             var user = await _usuarioService.BuscarPorLogin(req);
 
-            if (user == null || user.SenhaHash != req.Senha)
+            if (user == null || string.IsNullOrWhiteSpace(user.SenhaHash))
                 return Unauthorized("Usuário ou senha inválidos");
 
             var senhaValida = BCrypt.Net.BCrypt.Verify(req.Senha, user.SenhaHash);
@@ -32,16 +37,21 @@ namespace VestibularPeerToPeer.API.Controllers
             if (!senhaValida)
                 return Unauthorized("Senha inválida");
 
-            var tokenService = new TokenService("SUA_CHAVE_SECRETA_AQUI_123");
-
-            var token = tokenService.GerarToken(
+            var token = _tokenService.GerarToken(
                 user.Id ?? string.Empty,
-                user.Email ?? req.Email ?? string.Empty
+                user.Email ?? req.Email ?? string.Empty,
+                user.Nome
             );
 
             return Ok(new
             {
-                token = token
+                token,
+                user = new
+                {
+                    id = user.Id,
+                    nome = user.Nome,
+                    email = user.Email
+                }
             });
         }
     }

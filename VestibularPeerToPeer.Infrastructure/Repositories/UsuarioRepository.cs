@@ -79,7 +79,7 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
             }
         }
 
-        public async Task<UsuarioModel> BuscarPorLogin(LoginRequestModel req)
+        public async Task<UsuarioModel?> BuscarPorLogin(LoginRequestModel req)
         {
             if (string.IsNullOrWhiteSpace(req.Email))
                 throw new ArgumentException("Email não pode ser vazio.", nameof(req.Email));
@@ -89,11 +89,10 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
 
             var query = @"
                 SELECT
-                    id AS Id,
+                    id::text AS Id,
                     nome AS Nome,
                     email AS Email,
-                    senha_hash AS Senha,
-                    email AS Login
+                    senha_hash AS SenhaHash
                 FROM public.usuarios
                 WHERE email = @Email
                   AND ativo = true
@@ -102,12 +101,6 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
             try
             {
                 var usuario = await _context.Get<UsuarioModel>(query, dbParams, CommandType.Text);
-                
-                if(usuario == null)
-                    {
-                        throw new Exception("Usuário não encontrado ou inativo.");
-                    }
-
                 return usuario;
             }
             catch (Exception ex)

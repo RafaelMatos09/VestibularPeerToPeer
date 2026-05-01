@@ -8,7 +8,7 @@ namespace VestibularPeerToPeer.Domain.Models
 {
     public class LoginRequestModel  
     {
-        public string? Id { get; set; }
+        public Guid? Id { get; set; }
         public string? Email { get; set; }
         public string Senha { get; set; } = string.Empty;
     }
