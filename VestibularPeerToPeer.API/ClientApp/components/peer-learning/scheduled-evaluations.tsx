@@ -5,11 +5,29 @@ import { Clock } from 'lucide-react';
 import { useGamification } from '@/contexts/gamification-context';
 import { gamificationService } from '@/services/gamification';
 import type { ScheduledEvaluation } from '@/types';
+import ModalAgendarAvaliacao, { type AlunoAvaliacao } from './ModalAgendarAvaliacao';
+
+/** Substituir por aluno escolhido na API / fluxo de pares quando estiver disponível */
+const AGENDAMENTO_ALUNO_PLACEHOLDER: AlunoAvaliacao = {
+  id: '00000000-0000-0000-0000-000000000001',
+  email: 'aluno@exemplo.com',
+  nome: 'Aluno (aguardando integração)',
+  ultimoAcesso: null,
+  alunoAvaliadoId: '00000000-0000-0000-0000-000000000002',
+  alunoAvaliadorId: '00000000-0000-0000-0000-000000000003',
+  exercicioId: 1,
+  notaExercicio: 4,
+  notaComportamentoAvaliado: 4,
+  notaComportamentoAvaliador: 5,
+  notaTotal: 4.33,
+};
 
 export function ScheduledEvaluations() {
   const { peerPoints } = useGamification();
   const [evaluations, setEvaluations] = useState<ScheduledEvaluation[]>([]);
   const minPointsRequired = 3;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedAluno, setSelectedAluno] = useState<AlunoAvaliacao | null>(null);
 
   useEffect(() => {
     const loadEvaluations = async () => {
@@ -18,6 +36,17 @@ export function ScheduledEvaluations() {
     };
     loadEvaluations();
   }, []);
+
+
+  const handleOpenModal = () => {
+    setSelectedAluno(AGENDAMENTO_ALUNO_PLACEHOLDER);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedAluno(null);
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6">
@@ -50,17 +79,26 @@ export function ScheduledEvaluations() {
         ))}
       </div>
       <button
-        disabled={peerPoints < minPointsRequired}
-        className={`w-full mt-4 py-3 rounded-lg font-semibold transition ${
-          peerPoints >= minPointsRequired
-            ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-        }`}
-      >
-        {peerPoints >= minPointsRequired
-          ? 'Agendar Nova Avaliação'
-          : `Precisa de ${minPointsRequired - peerPoints} pontos`}
-      </button>
+  onClick={handleOpenModal}
+  disabled={peerPoints < minPointsRequired}
+  className={`w-full mt-4 py-3 rounded-lg font-semibold transition ${
+    peerPoints >= minPointsRequired
+      ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+  }`}
+>
+  {peerPoints >= minPointsRequired
+    ? 'Agendar Nova Avaliação'
+    : `Precisa de ${minPointsRequired - peerPoints} pontos`}
+</button>
+
+      {selectedAluno && (
+        <ModalAgendarAvaliacao
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          aluno={selectedAluno}
+        />
+      )}
     </div>
   );
 }

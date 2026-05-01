@@ -15,7 +15,7 @@ namespace VestibularPeerToPeer.Infrastructure.Data
 
         Task<T?> Get<T>(string sql, object? param = null, CommandType commandType = CommandType.Text);
 
-        IEnumerable<T> GetAll<T>(string sql, object? param = null, CommandType commandType = CommandType.Text);
+        Task<IEnumerable<T>> GetAll<T>(string sql, object? param = null, CommandType commandType = CommandType.Text);
 
         Task<IEnumerable<T>> GetAllAsync<T>(string sql, object? param = null, CommandType commandType = CommandType.Text);
 
@@ -46,7 +46,7 @@ namespace VestibularPeerToPeer.Infrastructure.Data
             return connection.QueryFirstOrDefault<T>(sql, param, commandType: commandType);
         }
 
-        public IEnumerable<T> GetAll<T>(string sql, object? param = null, CommandType commandType = CommandType.Text)
+        public async Task<IEnumerable<T>> GetAll<T>(string sql, object? param = null, CommandType commandType = CommandType.Text)
         {
             using var connection = GetDbConnection();
             return connection.Query<T>(sql, param, commandType: commandType);

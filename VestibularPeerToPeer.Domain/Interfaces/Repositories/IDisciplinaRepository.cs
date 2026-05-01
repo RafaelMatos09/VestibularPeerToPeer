@@ -10,5 +10,6 @@ namespace VestibularPeerToPeer.Domain.Interfaces.Repositories
     public interface IDisciplinaRepository
     {
         Task<List<AvaliacaoModel>> ListarAvaliacoes();
+        Task<List<AvaliacaoUsuarioModel>> ListaAvaliacaoUsuario();
     }
 }

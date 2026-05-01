@@ -18,5 +18,11 @@ namespace VestibularPeerToPeer.API.Services
             var avaliacoes = await _disciplinaRepository.ListarAvaliacoes();
             return avaliacoes;
         }
+
+        public async Task<List<AvaliacaoUsuarioModel>> ListaAvaliacaoUsuario()
+        {
+            var avaliacoesUsuario = await _disciplinaRepository.ListaAvaliacaoUsuario();
+            return avaliacoesUsuario;
+        }
     }
 }

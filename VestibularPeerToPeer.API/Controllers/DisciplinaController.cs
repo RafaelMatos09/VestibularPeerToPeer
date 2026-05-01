@@ -31,5 +31,19 @@ namespace VestibularPeerToPeer.API.Controllers
             }
             
         }
+
+        [HttpGet("get-avaliacao-usuario")]
+        public async Task<IActionResult> GetAvaliacaoUsuario()
+        {
+            try
+            {
+                var avaliacoesUsuario = await _disciplinaService.ListaAvaliacaoUsuario();
+                return Ok(avaliacoesUsuario);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao listar avaliações do usuário.", ex);
+            }
+        }
     }
 }

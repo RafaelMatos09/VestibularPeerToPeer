@@ -35,12 +35,39 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
                         ORDER BY a.data_avaliacao";
             try
             {
-                var result = _contextDapper.GetAll<AvaliacaoModel>(query, null, CommandType.Text);
+                var result = await _contextDapper.GetAll<AvaliacaoModel>(query, null, CommandType.Text);
                 return result.ToList();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw new Exception($"Erro ao listar avaliações!: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<List<AvaliacaoUsuarioModel>> ListaAvaliacaoUsuario()
+        {
+            var query = @"SELECT 
+                            u.email,
+                            u.nome,
+                            u.ultimo_acesso AS ultimoAcesso,
+                            a.aluno_avaliado_id AS alunoAvaliadoId,
+                            a.aluno_avaliador_id AS alunoAvaliadorId,
+                            a.exercicio_id AS exercicioId,
+                            a.nota_exercicio AS notaExercicio,
+                            a.nota_comportamento_avaliado AS notaComportamentoAvaliado,
+                            a.nota_comportamento_avaliador AS notaComportamentoAvaliador,
+                            a.nota_total as notaTotal
+                        FROM avaliacoes a
+                        JOIN usuarios u 
+                          ON u.id = a.aluno_avaliado_id";
+            try
+            {
+                var result = await _contextDapper.GetAll<AvaliacaoUsuarioModel>(query, null, CommandType.Text);
+                return result.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao listar avaliações!: {ex.Message}", ex);
             }
         }
     }
