@@ -1,8 +1,8 @@
-using VestibularPeerToPeer.Domain.Models.Usuario;
-using VestibularPeerToPeer.Infrastructure.Data;
-using VestibularPeerToPeer.Domain.Interfaces.Repositories;
-using VestibularPeerToPeer.Domain.Models.Login;
 using Dapper;
+using System.Data;
+using VestibularPeerToPeer.Domain.Interfaces.Repositories;
+using VestibularPeerToPeer.Domain.Models;
+using VestibularPeerToPeer.Infrastructure.Data;
 
 namespace VestibularPeerToPeer.Infrastructure.Repositories
 {
@@ -84,7 +84,10 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
             if (string.IsNullOrWhiteSpace(req.Email))
                 throw new ArgumentException("Email não pode ser vazio.", nameof(req.Email));
 
-            const string selectSql = @"
+            var dbParams = new DynamicParameters();
+            dbParams.Add("@Email", req.Email);
+
+            var query = @"
                 SELECT
                     id AS Id,
                     nome AS Nome,
@@ -94,14 +97,17 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
                 FROM public.usuarios
                 WHERE email = @Email
                   AND ativo = true
-                LIMIT 1;";
+                LIMIT 1";
 
             try
             {
-                var usuario = await _context.GetAsync<UsuarioModel>(
-                    selectSql,
-                    new { Email = req.Email.Trim() }
-                );
+                var usuario = await _context.Get<UsuarioModel>(query, dbParams, CommandType.Text);
+                
+                if(usuario == null)
+                    {
+                        throw new Exception("Usuário não encontrado ou inativo.");
+                    }
+
                 return usuario;
             }
             catch (Exception ex)

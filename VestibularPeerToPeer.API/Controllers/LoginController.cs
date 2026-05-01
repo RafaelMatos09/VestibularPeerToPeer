@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using VestibularPeerToPeer.API.Services;
 using VestibularPeerToPeer.Domain.Interfaces.Services;
-using VestibularPeerToPeer.Domain.Models.Login;
+using VestibularPeerToPeer.Domain.Models;
 using VestibularPeerToPeer.Infrastructure.Repositories;
 
 namespace VestibularPeerToPeer.API.Controllers

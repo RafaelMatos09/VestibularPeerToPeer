@@ -1,5 +1,4 @@
-﻿using VestibularPeerToPeer.Domain.Models.Login;
-using VestibularPeerToPeer.Domain.Models.Usuario;
+﻿using VestibularPeerToPeer.Domain.Models;
 
 namespace VestibularPeerToPeer.Domain.Interfaces.Services
 {

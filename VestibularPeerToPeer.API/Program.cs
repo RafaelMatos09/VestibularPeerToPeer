@@ -11,7 +11,7 @@ using VestibularPeerToPeer.Infrastructure.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 
-var key = Encoding.ASCII.GetBytes("SUA_CHAVE_SECRETA_AQUI_123");
+var key = Encoding.ASCII.GetBytes("putalawea");
 
 builder.Services.AddAuthentication(options =>
 {

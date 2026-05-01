@@ -13,7 +13,7 @@ namespace VestibularPeerToPeer.Infrastructure.Data
     {
         DbConnection GetDbConnection();
 
-        T? Get<T>(string sql, object? param = null, CommandType commandType = CommandType.Text);
+        Task<T?> Get<T>(string sql, object? param = null, CommandType commandType = CommandType.Text);
 
         IEnumerable<T> GetAll<T>(string sql, object? param = null, CommandType commandType = CommandType.Text);
 
@@ -40,7 +40,7 @@ namespace VestibularPeerToPeer.Infrastructure.Data
             return new NpgsqlConnection(_connectionString);
         }
 
-        public T? Get<T>(string sql, object? param = null, CommandType commandType = CommandType.Text)
+        public async Task<T?> Get<T>(string sql, object? param = null, CommandType commandType = CommandType.Text)
         {
             using var connection = GetDbConnection();
             return connection.QueryFirstOrDefault<T>(sql, param, commandType: commandType);

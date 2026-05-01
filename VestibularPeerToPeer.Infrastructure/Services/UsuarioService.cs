@@ -1,7 +1,6 @@
 ﻿using VestibularPeerToPeer.Domain.Interfaces.Repositories;
 using VestibularPeerToPeer.Domain.Interfaces.Services;
-using VestibularPeerToPeer.Domain.Models.Login;
-using VestibularPeerToPeer.Domain.Models.Usuario;
+using VestibularPeerToPeer.Domain.Models;
 
 namespace VestibularPeerToPeer.Infrastructure.Services
 {
@@ -23,5 +22,6 @@ namespace VestibularPeerToPeer.Infrastructure.Services
         {
             return await _usuarioRepository.BuscarPorLogin(loginRequest);
         }
+        
     }
 }

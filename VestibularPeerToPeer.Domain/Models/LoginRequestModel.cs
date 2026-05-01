@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VestibularPeerToPeer.Domain.Models.Login
+namespace VestibularPeerToPeer.Domain.Models
 {
     public class LoginRequestModel  
     {
