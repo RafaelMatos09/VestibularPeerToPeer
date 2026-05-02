@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VestibularPeerToPeer.Domain.Interfaces.Services;
+using VestibularPeerToPeer.Domain.Models;
 
 namespace VestibularPeerToPeer.API.Controllers
 {
@@ -41,6 +42,20 @@ namespace VestibularPeerToPeer.API.Controllers
                 return Ok(avaliacoesUsuario);
             }
             catch (Exception ex)
+            {
+                throw new Exception("Erro ao listar avaliações do usuário.", ex);
+            }
+        }
+
+        [HttpGet("get-avaliacao-usuario-id")]
+        public async Task<IActionResult> GetAvaliacaoUsuarioId(Guid id)
+        {
+            try
+            {
+                var avaliacaoUsuarioId = await _disciplinaService.ListarAvaliacaoAvaliadorId(id);
+                return Ok(avaliacaoUsuarioId);
+            }
+            catch(Exception ex)
             {
                 throw new Exception("Erro ao listar avaliações do usuário.", ex);
             }

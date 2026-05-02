@@ -11,5 +11,6 @@ namespace VestibularPeerToPeer.Domain.Interfaces.Repositories
     {
         Task<List<AvaliacaoModel>> ListarAvaliacoes();
         Task<List<AvaliacaoUsuarioModel>> ListaAvaliacaoUsuario();
+        Task<AvaliacaoUsuarioModel> ListarAvaliacaoAvaliadorId(Guid id);
     }
 }

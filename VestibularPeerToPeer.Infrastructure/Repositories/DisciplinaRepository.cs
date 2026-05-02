@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -45,7 +46,7 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
         }
 
         public async Task<List<AvaliacaoUsuarioModel>> ListaAvaliacaoUsuario()
-        {
+        {            
             var query = @"SELECT 
                             u.email,
                             u.nome,
@@ -66,6 +67,41 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
                 return result.ToList();
             }
             catch (Exception ex)
+            {
+                throw new Exception($"Erro ao listar avaliações!: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<AvaliacaoUsuarioModel> ListarAvaliacaoAvaliadorId(Guid id)
+        {
+            var dbPara = new DynamicParameters();
+            dbPara.Add("@Id", id);
+
+            var query = @"SELECT 
+                            u.email,
+                            u.nome,
+                            u.ultimo_acesso AS ultimoAcesso,
+                            a.aluno_avaliado_id AS alunoAvaliadoId,
+                            a.aluno_avaliador_id AS alunoAvaliadorId,
+                            a.exercicio_id AS exercicioId,
+                            a.nota_exercicio AS notaExercicio,
+                            a.nota_comportamento_avaliado AS notaComportamentoAvaliado,
+                            a.nota_comportamento_avaliador AS notaComportamentoAvaliador,
+                            a.nota_total as notaTotal
+                        FROM avaliacoes a
+                        JOIN usuarios u 
+                          ON u.id = a.aluno_avaliado_id
+                        WHERE a.aluno_avaliador_id = @Id";
+            try
+            {
+                var result = await _contextDapper.Get<AvaliacaoUsuarioModel>(query, dbPara, CommandType.Text);
+                if(result == null)
+                {
+                    throw new Exception("Avaliação não encontrada para o avaliador informado.");
+                }
+                return result;
+            }
+            catch(Exception ex)
             {
                 throw new Exception($"Erro ao listar avaliações!: {ex.Message}", ex);
             }
