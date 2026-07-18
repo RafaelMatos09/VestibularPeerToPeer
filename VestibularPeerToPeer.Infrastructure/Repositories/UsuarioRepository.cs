@@ -92,7 +92,9 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
                     id::text AS Id,
                     nome AS Nome,
                     email AS Email,
-                    senha_hash AS SenhaHash
+                    senha_hash AS SenhaHash,
+                    tipo_usuario_id AS TipoUsuarioId,
+                    instituicao_id AS InstituicaoId
                 FROM public.usuarios
                 WHERE email = @Email
                   AND ativo = true

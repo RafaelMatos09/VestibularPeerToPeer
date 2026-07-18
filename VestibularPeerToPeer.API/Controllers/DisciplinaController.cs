@@ -7,7 +7,7 @@ using VestibularPeerToPeer.Domain.Models;
 namespace VestibularPeerToPeer.API.Controllers
 {
     [ApiController]
-    [Route("disciplina")]
+    [Route("api/disciplina")]
     [Authorize]
     public class DisciplinaController : ControllerBase
     {
@@ -48,7 +48,7 @@ namespace VestibularPeerToPeer.API.Controllers
         }
 
         [HttpGet("get-avaliacao-usuario-id")]
-        public async Task<IActionResult> GetAvaliacaoUsuarioId(Guid id)
+        public async Task<IActionResult> GetAvaliacaoUsuarioId([FromQuery] Guid id)
         {
             try
             {

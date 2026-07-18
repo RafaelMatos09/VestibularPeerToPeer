@@ -72,7 +72,7 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
             }
         }
 
-        public async Task<AvaliacaoUsuarioModel> ListarAvaliacaoAvaliadorId(Guid id)
+        public async Task<List<AvaliacaoUsuarioModel>> ListarAvaliacaoAvaliadorId(Guid id)
         {
             var dbPara = new DynamicParameters();
             dbPara.Add("@Id", id);
@@ -91,15 +91,12 @@ namespace VestibularPeerToPeer.Infrastructure.Repositories
                         FROM avaliacoes a
                         JOIN usuarios u 
                           ON u.id = a.aluno_avaliado_id
-                        WHERE a.aluno_avaliador_id = @Id";
+                        WHERE a.aluno_avaliador_id = @Id
+                        ORDER BY a.exercicio_id, u.nome";
             try
             {
-                var result = await _contextDapper.Get<AvaliacaoUsuarioModel>(query, dbPara, CommandType.Text);
-                if(result == null)
-                {
-                    throw new Exception("Avaliação não encontrada para o avaliador informado.");
-                }
-                return result;
+                var result = await _contextDapper.GetAll<AvaliacaoUsuarioModel>(query, dbPara, CommandType.Text);
+                return result?.ToList() ?? new List<AvaliacaoUsuarioModel>();
             }
             catch(Exception ex)
             {

@@ -25,4 +25,5 @@ export const usuarioService = {
       email: res.email,
     };
   },
+  
 };

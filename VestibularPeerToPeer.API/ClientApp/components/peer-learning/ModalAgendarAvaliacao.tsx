@@ -1,4 +1,3 @@
-import { UUID } from "crypto";
 import { useState, useEffect } from "react";
 
 export interface AlunoAvaliacao {
@@ -15,11 +14,23 @@ export interface AlunoAvaliacao {
   notaTotal: number;
 }
 
+export type MarcadorCalendarioAvaliacao = {
+  exercicioId: number;
+  alunoAvaliadoId: string;
+  /** true quando há notas (notaTotal) e interação válida */
+  avaliado: boolean;
+};
+
 interface ModalAgendarAvaliacaoProps {
   isOpen: boolean;
   onClose: () => void;
   aluno: AlunoAvaliacao;
   onConfirm?: (data: { date: Date; time: string }) => void;
+  /** visualizar = só consulta notas + marcadores; agendar = fluxo atual */
+  modo?: "agendar" | "visualizar";
+  marcadoresCalendario?: MarcadorCalendarioAvaliacao[];
+  /** true quando a API retornou notaTotal nulo (exibir painel como pendente) */
+  notasPendentes?: boolean;
 }
 
 const MONTHS = [
@@ -29,15 +40,42 @@ const MONTHS = [
 const WEEKDAYS = ["D","S","T","Q","Q","S","S"];
 const TIME_SLOTS = ["08:00","09:30","11:00","14:00","15:30","17:00"];
 
-function ScoreBar({ label, score, max }: { label: string; score: number; max: number }) {
-  const pct = (score / max) * 100;
+/** Dia exibido no mês (sem data na API — alinha exercício + aluno para o badge) */
+export function diaCalendarioParaItem(
+  year: number,
+  month: number,
+  exercicioId: number,
+  alunoAvaliadoId: string
+): number {
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  let h = 0;
+  for (let i = 0; i < alunoAvaliadoId.length; i++) h += alunoAvaliadoId.charCodeAt(i);
+  return ((exercicioId * 17 + h) % daysInMonth) + 1;
+}
+
+function ScoreBar({
+  label,
+  score,
+  max,
+  pendente,
+}: {
+  label: string;
+  score: number;
+  max: number;
+  pendente?: boolean;
+}) {
+  const pct = pendente ? 0 : (score / max) * 100;
   const color = pct >= 90 ? "#10b981" : pct >= 70 ? "#7c3aed" : "#f59e0b";
   return (
     <div>
       <div className="flex justify-between items-center mb-1">
         <span className="text-xs text-gray-400">{label}</span>
         <span className="text-xs font-bold text-white">
-          {score}<span className="text-gray-500 font-normal">/{max}</span>
+          {pendente ? "—" : (
+            <>
+              {score}<span className="text-gray-500 font-normal">/{max}</span>
+            </>
+          )}
         </span>
       </div>
       <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
@@ -50,7 +88,25 @@ function ScoreBar({ label, score, max }: { label: string; score: number; max: nu
   );
 }
 
-function ScoreRing({ score, max = 5 }: { score: number; max?: number }) {
+function ScoreRing({
+  score,
+  max = 5,
+  pendente,
+}: {
+  score: number;
+  max?: number;
+  pendente?: boolean;
+}) {
+  if (pendente) {
+    return (
+      <div
+        className="flex items-center justify-center w-[72px] h-[72px] rounded-full text-[10px] text-center leading-tight text-gray-400 px-1"
+        style={{ border: "2px solid rgba(255,255,255,0.08)" }}
+      >
+        Notas pendentes
+      </div>
+    );
+  }
   const r = 28;
   const circumference = 2 * Math.PI * r;
   const offset = circumference - (score / max) * circumference;
@@ -75,6 +131,9 @@ export default function ModalAgendarAvaliacao({
   onClose,
   aluno,
   onConfirm,
+  modo = "agendar",
+  marcadoresCalendario = [],
+  notasPendentes = false,
 }: ModalAgendarAvaliacaoProps) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -92,10 +151,16 @@ export default function ModalAgendarAvaliacao({
     }
   }, [isOpen]);
 
-  if (!isOpen) return null;
-
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
+
+  useEffect(() => {
+    if (!isOpen || modo !== "visualizar") return;
+    const day = diaCalendarioParaItem(year, month, aluno.exercicioId, aluno.alunoAvaliadoId);
+    setSelectedDate(new Date(year, month, day));
+  }, [isOpen, modo, aluno.exercicioId, aluno.alunoAvaliadoId, year, month]);
+
+  if (!isOpen) return null;
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
@@ -105,10 +170,17 @@ export default function ModalAgendarAvaliacao({
   ];
 
   const handleDayClick = (day: number) => {
+    if (modo === "visualizar") return;
     const date = new Date(year, month, day);
     if (date < today) return;
     setSelectedDate(date);
   };
+
+  const marcadoresNoDia = (day: number) =>
+    marcadoresCalendario.filter(
+      (m) =>
+        diaCalendarioParaItem(year, month, m.exercicioId, m.alunoAvaliadoId) === day
+    );
 
   const handleConfirm = () => {
     if (!selectedDate || !selectedSlot) return;
@@ -141,8 +213,12 @@ export default function ModalAgendarAvaliacao({
         {/* Header */}
         <div className="flex items-start justify-between mb-5">
           <div>
-            <p className="text-xs uppercase tracking-widest text-purple-400 font-medium mb-1">Agendamento</p>
-            <h2 className="text-2xl font-bold text-white leading-tight">Cadastro de Avaliação</h2>
+            <p className="text-xs uppercase tracking-widest text-purple-400 font-medium mb-1">
+              {modo === "visualizar" ? "Visualização" : "Agendamento"}
+            </p>
+            <h2 className="text-2xl font-bold text-white leading-tight">
+              {modo === "visualizar" ? "Avaliações no calendário" : "Cadastro de Avaliação"}
+            </h2>
           </div>
           <button
             onClick={onClose}
@@ -201,6 +277,17 @@ export default function ModalAgendarAvaliacao({
               ))}
             </div>
 
+            {modo === "visualizar" && marcadoresCalendario.length > 0 && (
+              <div className="flex flex-wrap items-center gap-3 mb-2 text-[10px] text-gray-400">
+                <span className="inline-flex items-center gap-1">
+                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" /> Com notas
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <span className="inline-block w-2 h-2 rounded-full bg-amber-500" /> Pendente / sem nota
+                </span>
+              </div>
+            )}
+
             {/* Days grid */}
             <div className="grid grid-cols-7 gap-0.5">
               {calDays.map((day, i) => {
@@ -209,32 +296,48 @@ export default function ModalAgendarAvaliacao({
                 const isPast = date < today;
                 const isToday = date.getTime() === today.getTime();
                 const isSel = selectedDate?.getTime() === date.getTime();
+                const marcadores = marcadoresNoDia(day);
                 return (
                   <div
                     key={i}
-                    onClick={() => !isPast && handleDayClick(day)}
+                    onClick={() => handleDayClick(day)}
                     className={`
-                      rounded-lg text-center py-1.5 text-xs transition-all select-none
-                      ${isPast ? "text-gray-600 cursor-not-allowed" : "cursor-pointer"}
+                      rounded-lg text-center py-1 text-xs transition-all select-none min-h-[2.25rem] flex flex-col items-center justify-start
+                      ${isPast && modo === "agendar" ? "text-gray-600 cursor-not-allowed" : modo === "visualizar" ? "cursor-default" : "cursor-pointer"}
                       ${isSel ? "bg-purple-600 text-white font-bold" : ""}
                       ${isToday && !isSel ? "text-purple-300 font-semibold" : ""}
-                      ${!isSel && !isPast && !isToday ? "text-gray-300 hover:bg-purple-500/20" : ""}
+                      ${!isSel && (!isPast || modo === "visualizar") && !isToday ? "text-gray-300 hover:bg-purple-500/20" : ""}
+                      ${isPast && modo === "visualizar" ? "text-gray-400" : ""}
                     `}
                     style={isToday && !isSel ? { border: "1.5px solid #7c3aed" } : {}}
                   >
-                    {day}
+                    <span>{day}</span>
+                    {marcadores.length > 0 && (
+                      <div className="flex justify-center gap-0.5 mt-0.5 flex-wrap px-0.5">
+                        {marcadores.slice(0, 4).map((m, mi) => (
+                          <span
+                            key={`${m.alunoAvaliadoId}-${m.exercicioId}-${mi}`}
+                            className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
+                            style={{ background: m.avaliado ? "#10b981" : "#f59e0b" }}
+                            title={m.avaliado ? "Com notas (avaliação registrada)" : "Pendente de nota"}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })}
             </div>
 
             {/* Time slots */}
+            {modo === "agendar" && (
             <div className="mt-4">
               <p className="text-xs text-gray-400 uppercase tracking-wider mb-2 font-medium">Horário disponível</p>
               <div className="grid grid-cols-3 gap-1.5">
                 {TIME_SLOTS.map((t) => (
                   <button
                     key={t}
+                    type="button"
                     onClick={() => setSelectedSlot(t)}
                     className={`
                       rounded-lg py-1.5 text-xs font-medium transition-all
@@ -255,6 +358,7 @@ export default function ModalAgendarAvaliacao({
                 ))}
               </div>
             </div>
+            )}
           </div>
 
           {/* RIGHT: Dashboard */}
@@ -266,11 +370,17 @@ export default function ModalAgendarAvaliacao({
               className="flex items-center gap-4 rounded-xl p-3"
               style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
             >
-              <ScoreRing score={aluno.notaTotal} />
+              <ScoreRing score={aluno.notaTotal} pendente={notasPendentes} />
               <div>
                 <p className="text-xs text-gray-400 mb-0.5">Nota Total</p>
-                <p className="text-2xl font-bold text-white leading-none">{aluno.notaTotal.toFixed(2)}</p>
-                <p className="text-xs text-purple-400 mt-1">⭐ Excelente desempenho</p>
+                <p className="text-2xl font-bold text-white leading-none">
+                  {notasPendentes ? "—" : aluno.notaTotal.toFixed(2)}
+                </p>
+                <p className="text-xs text-purple-400 mt-1">
+                  {notasPendentes
+                    ? "⏳ Aguardando lançamento de notas"
+                    : "⭐ Excelente desempenho"}
+                </p>
               </div>
             </div>
 
@@ -279,9 +389,9 @@ export default function ModalAgendarAvaliacao({
               className="rounded-xl p-3 flex flex-col gap-2.5"
               style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
             >
-              <ScoreBar label="Exercício" score={aluno.notaExercicio} max={5} />
-              <ScoreBar label="Comp. Avaliado" score={aluno.notaComportamentoAvaliado} max={5} />
-              <ScoreBar label="Comp. Avaliador" score={aluno.notaComportamentoAvaliador} max={5} />
+              <ScoreBar label="Exercício" score={aluno.notaExercicio} max={5} pendente={notasPendentes} />
+              <ScoreBar label="Comp. Avaliado" score={aluno.notaComportamentoAvaliado} max={5} pendente={notasPendentes} />
+              <ScoreBar label="Comp. Avaliador" score={aluno.notaComportamentoAvaliador} max={5} pendente={notasPendentes} />
             </div>
 
             {/* Selected date display */}
@@ -302,8 +412,10 @@ export default function ModalAgendarAvaliacao({
               </p>
             </div>
 
-            {/* Confirm button */}
+            {/* Confirm / Fechar */}
+            {modo === "agendar" ? (
             <button
+              type="button"
               onClick={handleConfirm}
               disabled={!selectedDate || !selectedSlot || confirmed}
               className="rounded-xl py-3 text-sm font-semibold tracking-wide text-white mt-auto transition-all disabled:opacity-40 disabled:cursor-not-allowed"
@@ -315,6 +427,18 @@ export default function ModalAgendarAvaliacao({
             >
               {confirmed ? "✓ Agendado com sucesso!" : "Confirmar Disponibilidade"}
             </button>
+            ) : (
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-xl py-3 text-sm font-semibold tracking-wide text-white mt-auto transition-all"
+              style={{
+                background: "linear-gradient(135deg,#4b5563,#6b7280)",
+              }}
+            >
+              Fechar
+            </button>
+            )}
           </div>
         </div>
       </div>

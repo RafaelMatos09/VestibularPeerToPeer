@@ -50,7 +50,9 @@ namespace VestibularPeerToPeer.API.Controllers
                 {
                     id = user.Id,
                     nome = user.Nome,
-                    email = user.Email
+                    email = user.Email,
+                    tipoUsuarioId = user.TipoUsuarioId,
+                    instituicaoId = user.InstituicaoId
                 }
             });
         }

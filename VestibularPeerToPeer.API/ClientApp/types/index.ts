@@ -4,6 +4,8 @@ export interface User {
   id?: string;
   name: string;
   email?: string;
+  tipoUsuarioId?: string;
+  instituicaoId?: string;
   avatar?: string;
 }
 
