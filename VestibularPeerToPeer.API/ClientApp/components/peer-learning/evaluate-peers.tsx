@@ -16,22 +16,22 @@ export function EvaluatePeers() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">Avaliar Colegas</h2>
+    <div className="rounded-xl border border-border bg-card p-6">
+      <h2 className="mb-4 text-xl font-bold text-foreground">Avaliar Colegas</h2>
       <div className="space-y-3">
         {pendingEvaluations.map((evaluation, index) => (
-          <div key={index} className="border border-gray-200 rounded-lg p-4">
+          <div key={index} className="rounded-lg border border-border p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-semibold text-gray-800">{evaluation.name}</p>
-                <p className="text-sm text-gray-600">{evaluation.subject}</p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="font-semibold text-foreground">{evaluation.name}</p>
+                <p className="text-sm text-muted-foreground">{evaluation.subject}</p>
+                <p className="mt-1 text-xs text-muted-foreground/80">
                   {evaluation.type} • {evaluation.questions} questões
                 </p>
               </div>
               <button
                 onClick={handleEvaluate}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition"
+                className="rounded-lg bg-primary px-4 py-2 font-semibold text-primary-foreground transition hover:bg-primary/90"
               >
                 Avaliar
               </button>

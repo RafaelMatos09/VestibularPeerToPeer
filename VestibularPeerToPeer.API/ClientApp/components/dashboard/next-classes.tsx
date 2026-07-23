@@ -10,24 +10,24 @@ const classes = [
 
 export function NextClasses() {
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">Próximas Aulas</h2>
+    <div className="rounded-xl border border-border bg-card p-6">
+      <h2 className="mb-4 text-xl font-bold text-foreground">Próximas Aulas</h2>
       <div className="space-y-3">
         {classes.map((aula, i) => (
           <div
             key={i}
-            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+            className="flex items-center justify-between rounded-lg bg-muted/50 p-3"
           >
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <Video className="text-blue-600" size={20} />
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent">
+                <Video className="text-primary" size={20} />
               </div>
               <div>
-                <p className="font-semibold text-gray-800">{aula.name}</p>
-                <p className="text-sm text-gray-500">Hoje às {aula.time}</p>
+                <p className="font-semibold text-foreground">{aula.name}</p>
+                <p className="text-sm text-muted-foreground">Hoje às {aula.time}</p>
               </div>
             </div>
-            <button className="text-blue-600 hover:text-blue-700 font-semibold">
+            <button className="font-semibold text-primary hover:text-primary/80">
               Assistir
             </button>
           </div>

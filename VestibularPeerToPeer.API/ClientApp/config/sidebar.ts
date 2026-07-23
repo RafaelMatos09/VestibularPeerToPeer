@@ -15,7 +15,7 @@ import type { SidebarItem } from '@/types';
 // Adicione ou remova itens aqui para modificar o menu
 export const sidebarItems: SidebarItem[] = [
   { icon: Home, label: 'Dashboard', path: '/dashboard' },
-  { icon: Users, label: 'Usuários', path: '/usuarios' },
+  { icon: Users, label: 'Profile', path: '/usuarios' },
   { icon: BookOpen, label: 'Disciplinas', path: '/disciplinas' },
   { icon: Video, label: 'Aulas', path: '/aulas' },
   { icon: FileText, label: 'Exercícios', path: '/exercicios' },

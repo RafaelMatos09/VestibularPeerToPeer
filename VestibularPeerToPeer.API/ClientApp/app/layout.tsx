@@ -2,10 +2,11 @@ import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
 import { AuthProvider } from '@/contexts/auth-context'
 import { GamificationProvider } from '@/contexts/gamification-context'
+import { ThemeProvider } from '@/components/theme-provider'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'VestibularComunitario',
+  title: 'VestAPI',
   description: 'Plataforma de aprendizado colaborativo para vestibular',
   generator: 'v0.app',
   icons: {
@@ -33,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-BR" className="bg-gray-100">
+    <html lang="pt-BR" className="dark" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -47,11 +48,18 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
-        <AuthProvider>
-          <GamificationProvider>
-            {children}
-          </GamificationProvider>
-        </AuthProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            <GamificationProvider>
+              {children}
+            </GamificationProvider>
+          </AuthProvider>
+        </ThemeProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

@@ -13,10 +13,10 @@ export function PeerLearning() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-800">Peer-to-Peer Learning</h1>
-        <div className="flex items-center space-x-2 bg-indigo-100 px-4 py-2 rounded-lg">
-          <Star className="text-indigo-600" size={20} />
-          <span className="font-semibold text-indigo-800">{peerPoints} Pontos P2P</span>
+        <h1 className="text-3xl font-bold text-foreground">Peer-to-Peer Learning</h1>
+        <div className="flex items-center space-x-2 rounded-lg border border-border bg-accent px-4 py-2">
+          <Star className="text-primary" size={20} />
+          <span className="font-semibold text-accent-foreground">{peerPoints} Pontos P2P</span>
         </div>
       </div>
 

@@ -126,25 +126,25 @@ export function ScheduledEvaluations() {
   const marcadoresCalendario = minhasAvaliacoes.map(dtoParaMarcadorCalendario);
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">
+    <div className="rounded-xl border border-border bg-card p-6">
+      <h2 className="mb-4 text-xl font-bold text-foreground">
         Minhas Avaliações Agendadas
       </h2>
 
       <div className="mb-6">
-        <h3 className="text-sm font-semibold text-gray-700 mb-2">
+        <h3 className="mb-2 text-sm font-semibold text-foreground">
           Avaliações como avaliador (exercícios)
         </h3>
         {!user?.id && (
-          <p className="text-sm text-gray-500">Faça login para ver suas avaliações.</p>
+          <p className="text-sm text-muted-foreground">Faça login para ver suas avaliações.</p>
         )}
         {user?.id && carregandoAvaliacoes && (
-          <p className="text-sm text-gray-500">Carregando avaliações…</p>
+          <p className="text-sm text-muted-foreground">Carregando avaliações…</p>
         )}
         {user?.id && !carregandoAvaliacoes && minhasAvaliacoes.length === 0 && (
-          <p className="text-sm text-gray-500">Nenhuma avaliação encontrada para seu usuário.</p>
+          <p className="text-sm text-muted-foreground">Nenhuma avaliação encontrada para seu usuário.</p>
         )}
-        <ul className="space-y-2 max-h-48 overflow-y-auto">
+        <ul className="max-h-48 space-y-2 overflow-y-auto">
           {minhasAvaliacoes.map((av) => {
             const key = `${av.alunoAvaliadoId}-${av.exercicioId}`;
             const temAluno =
@@ -156,16 +156,16 @@ export function ScheduledEvaluations() {
                 <button
                   type="button"
                   onClick={() => abrirVisualizacao(av)}
-                  className="w-full text-left rounded-lg border border-gray-200 px-3 py-2 hover:bg-indigo-50 hover:border-indigo-200 transition flex items-center justify-between gap-2"
+                  className="flex w-full items-center justify-between gap-2 rounded-lg border border-border px-3 py-2 text-left transition hover:border-primary/40 hover:bg-accent/30"
                 >
-                  <span className="font-medium text-gray-800">
+                  <span className="font-medium text-foreground">
                     Ex. #{av.exercicioId} — {av.nome}
                   </span>
                   <span
-                    className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
                       comNotas
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : 'bg-amber-100 text-amber-900'
+                        ? 'bg-primary/20 text-primary'
+                        : 'bg-accent text-accent-foreground'
                     }`}
                   >
                     {comNotas ? 'Avaliado' : 'Pendente'}
@@ -179,21 +179,21 @@ export function ScheduledEvaluations() {
 
       <div className="space-y-3">
         {evaluations.map((evaluation) => (
-          <div key={evaluation.id} className="border border-gray-200 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-semibold text-gray-800">{evaluation.student}</span>
+          <div key={evaluation.id} className="rounded-lg border border-border p-4">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="font-semibold text-foreground">{evaluation.student}</span>
               <span
-                className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                className={`rounded-full px-3 py-1 text-xs font-semibold ${
                   evaluation.type === 'Prova'
-                    ? 'bg-red-100 text-red-700'
-                    : 'bg-blue-100 text-blue-700'
+                    ? 'bg-destructive/20 text-destructive'
+                    : 'bg-primary/20 text-primary'
                 }`}
               >
                 {evaluation.type}
               </span>
             </div>
-            <p className="text-sm text-gray-600 mb-1">{evaluation.subject}</p>
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
+            <p className="mb-1 text-sm text-muted-foreground">{evaluation.subject}</p>
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
               <Clock size={14} />
               <span>
                 {evaluation.date} às {evaluation.time}
@@ -205,10 +205,10 @@ export function ScheduledEvaluations() {
       <button
         onClick={handleOpenModalAgendar}
         disabled={peerPoints < minPointsRequired}
-        className={`w-full mt-4 py-3 rounded-lg font-semibold transition ${
+        className={`mt-4 w-full rounded-lg py-3 font-semibold transition ${
           peerPoints >= minPointsRequired
-            ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+            : 'cursor-not-allowed bg-muted text-muted-foreground'
         }`}
       >
         {peerPoints >= minPointsRequired

@@ -13,17 +13,17 @@ export function Dashboard() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2 bg-yellow-100 px-4 py-2 rounded-lg">
-            <Star className="text-yellow-600" size={20} />
-            <span className="font-semibold text-yellow-800">
+          <div className="flex items-center space-x-2 rounded-lg border border-border bg-accent px-4 py-2">
+            <Star className="text-primary" size={20} />
+            <span className="font-semibold text-accent-foreground">
               {gamification.points} pontos
             </span>
           </div>
-          <div className="flex items-center space-x-2 bg-purple-100 px-4 py-2 rounded-lg">
-            <Award className="text-purple-600" size={20} />
-            <span className="font-semibold text-purple-800">
+          <div className="flex items-center space-x-2 rounded-lg border border-border bg-secondary px-4 py-2">
+            <Award className="text-primary" size={20} />
+            <span className="font-semibold text-secondary-foreground">
               Nível {gamification.level}
             </span>
           </div>

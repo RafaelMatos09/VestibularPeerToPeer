@@ -22,36 +22,36 @@ export function TopStudents() {
   const getPositionStyle = (position: number) => {
     switch (position) {
       case 0:
-        return 'bg-yellow-400 text-yellow-900';
+        return 'bg-primary text-primary-foreground';
       case 1:
-        return 'bg-gray-300 text-gray-700';
+        return 'bg-muted text-muted-foreground';
       case 2:
-        return 'bg-orange-400 text-orange-900';
+        return 'bg-accent text-accent-foreground';
       default:
-        return 'bg-gray-200 text-gray-600';
+        return 'bg-secondary text-secondary-foreground';
     }
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">Top 10 Estudantes</h2>
+    <div className="rounded-xl border border-border bg-card p-6">
+      <h2 className="mb-4 text-xl font-bold text-foreground">Top 10 Estudantes</h2>
       <div className="space-y-3">
         {students.map((student, index) => (
           <div
             key={index}
-            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+            className="flex items-center justify-between rounded-lg bg-muted/50 p-3"
           >
             <div className="flex items-center space-x-4">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${getPositionStyle(
+                className={`flex h-8 w-8 items-center justify-center rounded-full font-bold ${getPositionStyle(
                   index
                 )}`}
               >
                 {index + 1}
               </div>
-              <span className="font-semibold text-gray-800">{student.name}</span>
+              <span className="font-semibold text-foreground">{student.name}</span>
             </div>
-            <span className="text-gray-600 font-semibold">{student.points} pts</span>
+            <span className="font-semibold text-muted-foreground">{student.points} pts</span>
           </div>
         ))}
       </div>
